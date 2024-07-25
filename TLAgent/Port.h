@@ -129,7 +129,7 @@ namespace tl_agent {
         uint8_t *param;
         uint8_t *size;
         uint8_t *source;
-        uint8_t *sink;
+        sink_t *sink;
         uint8_t *denied;
         Usr *usr;
         Echo *echo;
@@ -140,7 +140,7 @@ namespace tl_agent {
 
     class ChnE : public Decoupled {
     public:
-        uint8_t *sink;
+        sink_t *sink;
         paddr_t *addr;  // used for index scoreboard
         uint8_t *alias;
     };

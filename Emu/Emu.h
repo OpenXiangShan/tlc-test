@@ -49,7 +49,9 @@ public:
     inline void update_cycles(uint64_t inc);
     void execute(uint64_t nr_cycle);
     tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* naive_gen_port();
+#ifdef DUALCORE
     tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* naive_gen_port2();
+#endif
 };
 
 inline void Emu::reset(uint64_t n) {

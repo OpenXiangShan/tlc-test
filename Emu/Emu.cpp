@@ -81,8 +81,10 @@ Emu::Emu(int argc, char **argv) {
             auto port = naive_gen_port();
             agents[i]->connect(port);
         } else {
+        #ifdef DUALCORE
             auto port = naive_gen_port2();
             agents[i]->connect(port);
+        #endif
         }
         fuzzers[i] = new CFuzzer(static_cast<CAgent_t*>(agents[i]));
         fuzzers[i]->set_cycles(&Cycles);
@@ -295,7 +297,7 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
     port->e.sink = &(dut_ptr->master_port_0_0_e_bits_sink);
     return port;
 }
-
+#ifdef DUALCORE
 tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* Emu::naive_gen_port2() {
     auto port = new tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>();
     port->a.ready = &(dut_ptr->master_port_1_0_a_ready);
@@ -343,3 +345,4 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
     port->e.sink = &(dut_ptr->master_port_1_0_e_bits_sink);
     return port;
 }
+#endif

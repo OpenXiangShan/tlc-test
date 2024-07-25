@@ -15,6 +15,10 @@ if(DEFINED CHISELDB)
     add_definitions(-DENABLE_CHISEL_DB)
 endif()
 
+if(DEFINED DUALCORE)
+    add_definitions(-DDUALCORE)
+endif()
+
 if(DEFINED THREAD)
     add_definitions(-DVL_THREADED)
     find_package(Threads)
