@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(tlc_test)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE "Debug")
+# set(CMAKE_BUILD_TYPE "Debug")
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g2 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
@@ -17,6 +17,10 @@ endif()
 
 if(DEFINED DUALCORE)
     add_definitions(-DDUALCORE)
+endif()
+
+if(DEFINED NOCHECK)
+    add_definitions(-DNOCHECK)
 endif()
 
 if(DEFINED THREAD)

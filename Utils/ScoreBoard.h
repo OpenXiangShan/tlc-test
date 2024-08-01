@@ -47,6 +47,13 @@ private:
 public:
     int verify(const T& key, const uint8_t* data);
     void unpending(const T& key);
+#ifdef NOCHECK
+    std::map<T, std::shared_ptr<Global_SBEntry>>& get();
+    void update(const T& key, std::shared_ptr<Global_SBEntry>& data);
+    std::shared_ptr<Global_SBEntry> query(const T& key);
+    void erase(const T& key);
+    bool haskey(const T& key);
+#endif
 };
 
 /************************** Implementation **************************/
@@ -105,8 +112,10 @@ bool ScoreBoard<Tk, Tv>::haskey(const Tk &key) {
     return mapping.count(key) > 0;
 }
 
+/************************** GlobalBoard **************************/
 template<typename T>
 int GlobalBoard<T>::data_check(const uint8_t *dut, const uint8_t *ref, std::string assert_info) {
+#ifndef NOCHECK
     for (int i = 0; i < DATASIZE; i++) {
         if (dut[i] != ref[i]) {
             printf("dut: ");
@@ -122,11 +131,13 @@ int GlobalBoard<T>::data_check(const uint8_t *dut, const uint8_t *ref, std::stri
             return -1;
         }
     }
+#endif
     return 0;
 }
 
 template<typename T>
 int GlobalBoard<T>::verify(const T& key, const uint8_t* data) {
+#ifndef NOCHECK
     if (this->mapping.count(key) == 0) { // we assume data is all zero initially
         return this->data_check(data, init_zeros, "Init data is non-zero!");
     }
@@ -163,10 +174,14 @@ int GlobalBoard<T>::verify(const T& key, const uint8_t* data) {
         tlc_assert(false, "Unknown GlobalBoard entry status!");
         return -1;
     }
+#else
+    return 0;
+#endif
 }
 
 template<typename T>
 void GlobalBoard<T>::unpending(const T& key) {
+#ifndef NOCHECK
     tlc_assert(this->mapping.count(key) == 1, "Un-pending non-exist entry in GlobalBoard!");
     Global_SBEntry* value = this->mapping.at(key).get();
     // tlc_assert(value->pending_data != nullptr, "Un-pending entry with NULL ptr in GlobalBoard!");
@@ -176,6 +191,40 @@ void GlobalBoard<T>::unpending(const T& key) {
     value->data = value->pending_data;
     value->pending_data = nullptr;
     value->status = Global_SBEntry::SB_VALID;
+#else
+    return;
+#endif
 }
+
+#ifdef NOCHECK
+template<typename T>
+std::map<T, std::shared_ptr<Global_SBEntry>>& GlobalBoard<T>::get() {
+    return this->mapping;
+}
+
+template<typename T>
+void GlobalBoard<T>::update(const T& key, std::shared_ptr<Global_SBEntry>& data) {
+    return;
+}
+
+template<typename T>
+std::shared_ptr<Global_SBEntry> GlobalBoard<T>::query(const T& key) {
+    // TODO: this may be fine,
+    // cuz we also haskey to check its existence before query
+    // so hopefully we won't reach here
+    return NULL;
+}
+
+template<typename T>
+void GlobalBoard<T>::erase(const T& key) {
+    return;
+}
+
+template<typename T>
+bool GlobalBoard<T>::haskey(const T& key) {
+    return false;
+}
+
+#endif // NOCHECK
 
 #endif // TLC_TEST_SCOREBOARD_H

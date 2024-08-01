@@ -17,7 +17,7 @@ while getopts "cbmr" OPT; do
       echo "-c: compile, make test-top-xsconfig in CoupledL2"
       echo "-b: build,   cmake .. in build"
       echo "-m: make,    make -j in build"
-      echo "-r: test run, ./build/tlc_test -c 50000"
+      echo "-r: test run, ./build/tlc_test -c 200000"
       exit 1
       ;;
   esac
@@ -30,7 +30,7 @@ if [ $B -eq 1 ]; then
     rm -rf build
     mkdir build
     cd build
-    cmake .. -DDUT_DIR=$CPHOME/build -DTHREADS=4 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Debug
+    cmake .. -DDUT_DIR=$CPHOME/build -DTHREADS=4 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Release -DNOCHECK=1
     cd ..
 fi
 if [ $M -eq 1 ]; then
@@ -39,5 +39,5 @@ if [ $M -eq 1 ]; then
     cd ..
 fi
 if [ $R -eq 1 ]; then
-    ./build/tlc_test -c 50000
+    ./build/tlc_test -c 200000
 fi
