@@ -294,6 +294,19 @@ namespace tl_agent {
     }
 
     void CAgent::fire_b() {
+        // To keep the same with hardware 'fire' logic
+        // we update b.ready first, then check whether b.fire
+
+        // so we have:
+        // 1. no pendingB -> update *b.ready = true
+        // 2. -> b.fire() = true -> accept B req
+        // 3. negedge
+        // 4. posedge (hardware fire happens here)
+        // ========== next Cycle ===========
+        // 5. has pendingB -> update *b.ready = false
+
+        *this->port->b.ready = !(pendingB.is_pending());
+
         if (this->port->b.fire()) {
             auto chnB = this->port->b;
             // Log("[%ld] [B fire] addr: %hx\n", *cycles, *chnB.address);
@@ -370,6 +383,9 @@ namespace tl_agent {
     }
 
     void CAgent::fire_d() {
+        // TODO: do random here
+        *this->port->d.ready = true;
+
         if (this->port->d.fire()) {
             auto chnD = this->port->d;
             bool hasData = *chnD.opcode == GrantData;
@@ -482,9 +498,6 @@ namespace tl_agent {
     }
 
     void CAgent::update_signal() {
-        *this->port->d.ready = true; // TODO: do random here
-        *this->port->b.ready = !(pendingB.is_pending());
-
         if (pendingA.is_pending()) {
             // TODO: do delay here
             send_a(pendingA.info);
