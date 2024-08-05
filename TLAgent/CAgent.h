@@ -67,6 +67,7 @@ namespace tl_agent {
         PendingTrans<ChnC<ReqField, EchoField, DATASIZE>> pendingC;
         PendingTrans<ChnD<RespField, EchoField, DATASIZE>> pendingD;
         PendingTrans<ChnE> pendingE;
+        PendingTrans<CMOReq> pendingCMOReq;
         /* Here we need a scoreboard called localBoard maintaining address->info
          * For convenience, an idMap(id->addr) is also maintained
          */
@@ -94,6 +95,10 @@ namespace tl_agent {
         TransResp do_acquirePerm(paddr_t address, int param, int alias);
         TransResp do_releaseData(paddr_t address, int param, uint8_t data[], int alias);
         TransResp do_releaseDataAuto(paddr_t address, int alias);
+
+        Resp send_cmo(std::shared_ptr<CMOReq> &cmo_req);
+        void fire_cmo_req();
+        TransResp do_Invalidate(paddr_t address);
     };
 
 }

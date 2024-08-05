@@ -68,6 +68,12 @@ namespace tl_agent {
         TIP
     };
 
+    enum {
+        Clean = 0,
+        Flush,
+        Inval
+    };
+
     class Decoupled {
     public:
         uint8_t *valid;
@@ -145,6 +151,16 @@ namespace tl_agent {
         uint8_t *alias;
     };
 
+    class CMOReq : public Decoupled {
+    public:
+        uint8_t *opcode;
+        paddr_t *address;
+    };
+    class CMOResp : public Decoupled {
+    public:
+        paddr_t *address;
+    };
+
     template<class ReqField, class RespField, class EchoField, std::size_t N>
     class Port {
     public:
@@ -153,6 +169,8 @@ namespace tl_agent {
         ChnC<ReqField, EchoField, N> c;
         ChnD<RespField, EchoField, N> d;
         ChnE e;
+        CMOReq cmo_req;
+        CMOResp cmo_resp;
     };
 
 }

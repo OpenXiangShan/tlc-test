@@ -30,7 +30,7 @@ namespace tl_agent {
     }
 
     CAgent::CAgent(GlobalBoard<paddr_t> *const gb, int id, uint64_t *cycles):
-        BaseAgent(), pendingA(), pendingB(), pendingC(), pendingD(), pendingE(), probeIDpool(NR_SOURCEID, NR_SOURCEID+1)
+        BaseAgent(), pendingA(), pendingB(), pendingC(), pendingD(), pendingE(), pendingCMOReq(), probeIDpool(NR_SOURCEID, NR_SOURCEID+1)
     {
         this->globalBoard = gb;
         this->id = id;
@@ -479,6 +479,7 @@ namespace tl_agent {
         fire_c();
         fire_e();
         fire_d();
+        fire_cmo_req();
     }
 
     void CAgent::update_signal() {
@@ -497,6 +498,9 @@ namespace tl_agent {
         }
         if (pendingE.is_pending()) {
             send_e(pendingE.info);
+        }
+        if (pendingCMOReq.is_pending()) {
+            send_cmo(pendingCMOReq.info);
         }
         // do timeout check lazily
         if (*this->cycles % TIMEOUT_INTERVAL == 0) {
@@ -751,5 +755,83 @@ namespace tl_agent {
               }
             }
         }
+    }
+
+    Resp CAgent::send_cmo(std::shared_ptr<CMOReq> &cmo_req){
+        switch (*cmo_req->opcode) {
+            case Clean: {
+                if (localBoard->haskey(*cmo_req->address)) {
+                    localBoard->query(*cmo_req->address)->update_status(S_SENDING_CMO, *cycles, 0);
+                } else {
+                    int statuses[4] = {S_INVALID};
+                    int privileges[4] = {INVALID};
+                    statuses[0] = S_SENDING_CMO;
+                    std::shared_ptr<C_SBEntry> entry(new C_SBEntry(statuses, privileges, *cycles)); // Set pending as INVALID
+                    localBoard->update(*cmo_req->address, entry);
+                }
+                break;
+            }
+            case Flush: {
+                if (localBoard->haskey(*cmo_req->address)) {
+                    localBoard->query(*cmo_req->address)->update_status(S_SENDING_CMO, *cycles, 0);
+                } else {
+                    int statuses[4] = {S_INVALID};
+                    int privileges[4] = {INVALID};
+                    statuses[0] = S_SENDING_CMO;
+                    std::shared_ptr<C_SBEntry> entry(new C_SBEntry(statuses, privileges, *cycles)); // Set pending as INVALID
+                    localBoard->update(*cmo_req->address, entry);
+                }
+                break;
+            }
+            case Inval: {
+                if (localBoard->haskey(*cmo_req->address)) {
+                    localBoard->query(*cmo_req->address)->update_status(S_SENDING_CMO, *cycles, 0);
+                } else {
+                    int statuses[4] = {S_INVALID};
+                    int privileges[4] = {INVALID};
+                    statuses[0] = S_SENDING_CMO;
+                    std::shared_ptr<C_SBEntry> entry(new C_SBEntry(statuses, privileges, *cycles)); // Set pending as INVALID
+                    localBoard->update(*cmo_req->address, entry);
+                }
+                break;
+            }
+            default:
+                tlc_assert(false, "Unknown opcode for channel CMO!");
+        }
+        *this->port->cmo_req.opcode = *cmo_req->opcode;
+        *this->port->cmo_req.address = *cmo_req->address;
+        *this->port->cmo_req.valid = true;
+        return OK;
+    }
+    
+    void CAgent::fire_cmo_req(){
+        if (this->port->cmo_req.fire()) {
+            auto CMOreq = this->port->cmo_req;
+            *CMOreq.valid = false;
+            pendingCMOReq.update();
+            auto info = localBoard->query(*pendingCMOReq.info->address);
+            info->update_status(S_VALID, *cycles, 0);  // TODO: add status S_CMO_WAITING_RESP
+        }
+    }
+
+    TransResp CAgent::do_Invalidate(paddr_t address){
+        if (localBoard->haskey(address)) { // check whether this transaction is legal
+            auto entry = localBoard->query(address);
+            auto privilege = entry->privilege[0];
+            int status[4];
+            for(int i = 0; i < 4; i++) {
+                status[i] = entry->status[i];
+            }
+            if (status[0] != S_VALID && status[0] != S_INVALID) {
+                return PENDING; // in the process of other transaction
+            }
+        }
+        std::shared_ptr<CMOReq> req_cmo(new CMOReq());
+        req_cmo->opcode = new uint8_t(Inval);
+        req_cmo->address = new paddr_t(address);
+        pendingCMOReq.init(req_cmo, 1);
+        Log("[%ld] [Invalidate] addr: %x \n", *cycles, address);
+
+        return SUCCESS;
     }
 }

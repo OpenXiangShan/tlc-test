@@ -32,6 +32,7 @@ namespace tl_agent {
         S_C_WAITING_D_INTR, // C wait for D response while probe interrupted
         S_A_WAITING_D_INTR, // A wait for D response while probe interrupted
         S_SENDING_E,        // ready to send E request actively
+        S_SENDING_CMO
     };
 
     class ReqField {

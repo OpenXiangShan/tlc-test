@@ -75,6 +75,8 @@ void CFuzzer::traceTest() {
     case (4 << 8) | tl_agent::ReleaseData:
     case (4 << 8) | tl_agent::Release:
         send_status = this->cAgent->do_releaseDataAuto(addr, 0);    break;
+    case (32 << 8) | tl_agent::Inval:
+        send_status = this->cAgent->do_Invalidate(addr);    break;
     default:
         std::cerr << "Error: Invalid Transaction " << channel << " Opcode " << opcode << std::endl;
         break;

@@ -293,6 +293,14 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
     port->e.ready = &(dut_ptr->master_port_0_0_e_ready);
     port->e.valid = &(dut_ptr->master_port_0_0_e_valid);
     port->e.sink = &(dut_ptr->master_port_0_0_e_bits_sink);
+
+    port->cmo_req.ready = &(dut_ptr->cmo_sender_port_0_0_ready);
+    port->cmo_req.valid = &(dut_ptr->cmo_sender_port_0_0_valid);
+    port->cmo_req.opcode = &(dut_ptr->cmo_sender_port_0_0_bits_opcode);
+    port->cmo_req.address = &(dut_ptr->cmo_sender_port_0_0_bits_address);
+    port->cmo_resp.ready = &(dut_ptr->cmo_recver_port_0_0_ready);
+    port->cmo_resp.valid = &(dut_ptr->cmo_recver_port_0_0_valid);
+    port->cmo_resp.address = &(dut_ptr->cmo_recver_port_0_0_bits_address);
     return port;
 }
 
@@ -341,5 +349,13 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
     port->e.ready = &(dut_ptr->master_port_1_0_e_ready);
     port->e.valid = &(dut_ptr->master_port_1_0_e_valid);
     port->e.sink = &(dut_ptr->master_port_1_0_e_bits_sink);
+
+    port->cmo_req.ready = &(dut_ptr->cmo_sender_port_1_0_ready);
+    port->cmo_req.valid = &(dut_ptr->cmo_sender_port_1_0_valid);
+    port->cmo_req.opcode = &(dut_ptr->cmo_sender_port_1_0_bits_opcode);
+    port->cmo_req.address = &(dut_ptr->cmo_sender_port_1_0_bits_address);
+    port->cmo_resp.ready = &(dut_ptr->cmo_recver_port_1_0_ready);
+    port->cmo_resp.valid = &(dut_ptr->cmo_recver_port_1_0_valid);
+    port->cmo_resp.address = &(dut_ptr->cmo_recver_port_1_0_bits_address);
     return port;
 }
