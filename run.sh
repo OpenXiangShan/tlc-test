@@ -30,7 +30,7 @@ if [ $B -eq 1 ]; then
     rm -rf build
     mkdir build
     cd build
-    cmake .. -DDUT_DIR=$CPHOME/build -DTHREADS=4 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Release -DNOCHECK=1
+    cmake .. -DDUT_DIR=$CPHOME/build -DTHREAD=4 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Release -DNOCHECK=1
     cd ..
 fi
 if [ $M -eq 1 ]; then
