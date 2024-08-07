@@ -8,6 +8,11 @@
 #include "../TLAgent/ULAgent.h"
 #include "../TLAgent/CAgent.h"
 
+// used in Fuzzer::traceTest()
+inline uint16_t chnAndOp(uint8_t a, uint8_t b) {
+    return (uint16_t)((a << 8) | b);
+}
+
 class Fuzzer {
 protected:
     uint64_t *cycles;

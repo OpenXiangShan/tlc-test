@@ -49,10 +49,6 @@ void CFuzzer::caseTest() {
     }
 }
 
-inline uint16_t connect(uint8_t a, uint8_t b) {
-    return (uint16_t)((a << 8) | b);
-}
-
 void CFuzzer::traceTest() {
     if (this->transactions.empty()) {
         return;
@@ -64,22 +60,22 @@ void CFuzzer::traceTest() {
     uint8_t param = t.param;
     int send_status;
 
-    switch (connect(channel, opcode))
+    switch (chnAndOp(channel, opcode))
     {
-    case (1 << 8) | tl_agent::AcquireBlock:
+    case (0 << 8) | tl_agent::AcquireBlock:
         send_status = this->cAgent->do_acquireBlock(addr, param, 0);    break;
-    case (1 << 8) | tl_agent::AcquirePerm:
+    case (0 << 8) | tl_agent::AcquirePerm:
         send_status = this->cAgent->do_acquirePerm(addr, param, 0);     break;
     // even if transaction has param, we still use releaseDataAuto here
     // in fear of releaseData may have unknown bugs untested
-    case (4 << 8) | tl_agent::ReleaseData:
-    case (4 << 8) | tl_agent::Release:
+    case (2 << 8) | tl_agent::ReleaseData:
+    case (2 << 8) | tl_agent::Release:
         send_status = this->cAgent->do_releaseDataAuto(addr, 0);    break;
     default:
-        std::cerr << "Error: Invalid Transaction " << channel << " Opcode " << opcode << std::endl;
+        std::cerr << "Error: Invalid C Transaction " << channel << " Opcode " << opcode << std::endl;
         break;
     }
-    // printf("[DEBUG] tring to send %s\n", t.to_string().c_str());
+    // printf("[DEBUG] C tring to send %s\n", t.to_string().c_str());
     // if succeeded/fail/pass to send, remove it from queue
     // TODO: whether still to send for PASS transations (whose permission is already satisfied)
     if (send_status != tl_agent::PENDING) {

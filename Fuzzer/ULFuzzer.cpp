@@ -3,7 +3,7 @@
 //
 
 #include "Fuzzer.h"
-
+extern int trans_count;
 ULFuzzer::ULFuzzer(tl_agent::ULAgent *ulAgent) {
     this->ulAgent = ulAgent;
 }
@@ -59,6 +59,35 @@ void ULFuzzer::tick() {
 }
 
 void ULFuzzer::traceTest() {
-  printf("[ERROR] TraceTest for ULFuzzer Not Implemented!\n");
-  exit(1);
+  if (this->transactions.empty()) {
+      return;
+  }
+  Transaction t = this->transactions.front();
+  paddr_t addr = t.addr;
+  uint8_t channel = t.channel;
+  uint8_t opcode = t.opcode;
+  int send_status;
+  uint8_t* putdata = new uint8_t[DATASIZE];
+
+  switch (chnAndOp(channel, opcode))
+  {
+  case (0 << 8) | tl_agent::Get:
+      send_status = this->ulAgent->do_getAuto(addr);    break;
+  case (0 << 8) | tl_agent::PutFullData:
+      for (int i = 0; i < DATASIZE; i++) {
+          putdata[i] = (uint8_t)rand();
+      }
+      send_status = this->ulAgent->do_putfulldata(addr, putdata);    break;
+  default:
+      std::cerr << "Error: Invalid UL Transaction " << channel << " Opcode " << opcode << std::endl;
+      break;
+  }
+  // printf("[DEBUG] UL tring to send %s\n", t.to_string().c_str());
+  // if succeeded/fail/pass to send, remove it from queue
+  // TODO: whether still to send for PASS transations (whose permission is already satisfied)
+  if (send_status != tl_agent::PENDING) {
+      this->transactions.pop();
+  }
+  if (send_status == tl_agent::SUCCESS) trans_count++;
+  // otherwise try it next cycle
 }

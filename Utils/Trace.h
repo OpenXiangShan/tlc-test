@@ -15,7 +15,7 @@ class Transaction {
 public:
     uint32_t timestamp;
     uint8_t agentId;
-    uint8_t channel;
+    uint8_t channel; // 0: A, 1: B, 2: C, 3: D, 4: E
     uint8_t opcode;
     paddr_t addr;
     uint8_t param;
