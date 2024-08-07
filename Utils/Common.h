@@ -35,7 +35,7 @@ inline char* logdb_filename(time_t t) {
 enum {
     DATASIZE = 64, // Cache line is 64B
     BEATSIZE = 32,
-    NR_ULAGENTS = 0,
+    NR_ULAGENTS = 1,
     NR_CAGENTS = 1,
     NR_SOURCEID = 16,
     TIMEOUT_INTERVAL = 5000

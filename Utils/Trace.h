@@ -7,7 +7,7 @@
 #include <sstream>
 #include <queue>
 
-#define READ_ONCE 5000
+#define READ_ONCE 10000
 #define END_TIMER 20000 // cycles to run after trace all sent
 
 // TODO: consider alias and other user fields

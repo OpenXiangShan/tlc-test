@@ -67,28 +67,40 @@ Emu::Emu(int argc, char **argv) {
     srand(this->seed);
 
     // Init agents
-    for (int i = 0; i < NR_ULAGENTS; i++) {
-        agents[i] = new ULAgent_t(globalBoard, i, &Cycles);
-        auto port = naive_gen_port();
-        agents[i]->connect(port);
-        fuzzers[i] = new ULFuzzer(static_cast<ULAgent_t*>(agents[i]));
-        fuzzers[i]->set_cycles(&Cycles);
-    }
+    // for (int i = 0; i < NR_ULAGENTS; i++) {
+    //     agents[i] = new ULAgent_t(globalBoard, i, &Cycles);
+    //     auto port = naive_gen_ULport();
+    //     agents[i]->connect(port);
+    //     fuzzers[i] = new ULFuzzer(static_cast<ULAgent_t*>(agents[i]));
+    //     fuzzers[i]->set_cycles(&Cycles);
+    // }
 
-    for (int i = NR_ULAGENTS; i < NR_AGENTS; i++) {
-        agents[i] = new CAgent_t(globalBoard, i, &Cycles);
-        if (i == 0) {
-            auto port = naive_gen_port();
-            agents[i]->connect(port);
-        } else {
-        #ifdef DUALCORE
-            auto port = naive_gen_port2();
-            agents[i]->connect(port);
-        #endif
-        }
-        fuzzers[i] = new CFuzzer(static_cast<CAgent_t*>(agents[i]));
-        fuzzers[i]->set_cycles(&Cycles);
-    }
+    // for (int i = NR_ULAGENTS; i < NR_AGENTS; i++) {
+    //     agents[i] = new CAgent_t(globalBoard, i, &Cycles);
+    //     if (i == 0) {
+    //         auto port = naive_gen_port();
+    //         agents[i]->connect(port);
+    //     } else {
+    //     #ifdef DUALCORE
+    //         auto port = naive_gen_port2();
+    //         agents[i]->connect(port);
+    //     #endif
+    //     }
+    //     fuzzers[i] = new CFuzzer(static_cast<CAgent_t*>(agents[i]));
+    //     fuzzers[i]->set_cycles(&Cycles);
+    // }
+
+    agents[0] = new ULAgent_t(globalBoard, 0, &Cycles);
+    auto portul = naive_gen_ULport();
+    agents[0]->connect(portul);
+    fuzzers[0] = new ULFuzzer(static_cast<ULAgent_t*>(agents[0]));
+    fuzzers[0]->set_cycles(&Cycles);
+
+    agents[1] = new CAgent_t(globalBoard, 1, &Cycles);
+    auto portc = naive_gen_port();
+    agents[1]->connect(portc);
+    fuzzers[1] = new CFuzzer(static_cast<CAgent_t*>(agents[1]));
+    fuzzers[1]->set_cycles(&Cycles);
 
 #if VM_TRACE == 1
     if (this->enable_wave) {
@@ -300,6 +312,34 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
     port->e.sink = &(dut_ptr->master_port_0_0_e_bits_sink);
     return port;
 }
+
+// the following code is to be replaced soon, only for test
+tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* Emu::naive_gen_ULport() {
+    auto port = new tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>();
+    port->a.ready = &(dut_ptr->master_port_1_0_a_ready);
+    port->a.valid = &(dut_ptr->master_port_1_0_a_valid);
+    port->a.opcode = &(dut_ptr->master_port_1_0_a_bits_opcode);
+    port->a.param = &(dut_ptr->master_port_1_0_a_bits_param);
+    port->a.address = &(dut_ptr->master_port_1_0_a_bits_address);
+    port->a.size = &(dut_ptr->master_port_1_0_a_bits_size);
+    port->a.source = &(dut_ptr->master_port_1_0_a_bits_source);
+    port->a.mask = &(dut_ptr->master_port_1_0_a_bits_mask);
+    port->a.data = (uint8_t*)&(dut_ptr->master_port_1_0_a_bits_data);
+
+    port->d.ready = &(dut_ptr->master_port_1_0_d_ready);
+    port->d.valid = &(dut_ptr->master_port_1_0_d_valid);
+    port->d.opcode = &(dut_ptr->master_port_1_0_d_bits_opcode);
+    port->d.param = &(dut_ptr->master_port_1_0_d_bits_param);
+    port->d.size = &(dut_ptr->master_port_1_0_d_bits_size);
+    port->d.sink = &(dut_ptr->master_port_1_0_d_bits_sink);
+    port->d.source = &(dut_ptr->master_port_1_0_d_bits_source);
+    port->d.data = (uint8_t*)&(dut_ptr->master_port_1_0_d_bits_data);
+    // port->d.dirty = &(dut_ptr->master_port_1_0_d_bits_echo_blockisdirty);
+
+    return port;
+}
+
+
 #ifdef DUALCORE
 tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* Emu::naive_gen_port2() {
     auto port = new tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>();
