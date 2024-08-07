@@ -247,6 +247,9 @@ void Emu::execute(uint64_t nr_cycle) {
         }
 #endif
     }
+    dut_ptr->dump = 1;
+    this->neg_edge();
+    this->pos_edge();
 }
 
 // the following code is to be replaced soon, only for test
