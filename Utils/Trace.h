@@ -45,6 +45,7 @@ public:
         this->channel = std::stoi(tokens[2]);
         this->opcode = std::stoi(tokens[3]);
         this->addr = std::stoul(tokens[4]);
+        this->param = std::stoi(tokens[5]);
     }
 
     std::string to_string() {
