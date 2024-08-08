@@ -88,6 +88,7 @@ namespace tl_agent {
         *this->port->a.mask = *a->mask;
         *this->port->a.source = *a->source;
         *this->port->a.alias = *a->alias;
+        *this->port->a.prefetch = *a->prefetch; // TODO: set needHint=true for AcquireBlock only
         *this->port->a.valid = true;
         return OK;
     }
@@ -554,6 +555,7 @@ namespace tl_agent {
         req_a->mask = new uint32_t(0xffffffffUL);
         req_a->source = new uint8_t(this->idpool.getid());
         req_a->alias = new uint8_t(alias);
+        req_a->prefetch = new uint8_t(1);
         // Log("== id == acquire %d\n", *req_a->source);
         pendingA.init(req_a, 1);
         switch (param) {
@@ -602,6 +604,7 @@ namespace tl_agent {
         req_a->mask = new uint32_t(0xffffffffUL);
         req_a->source = new uint8_t(this->idpool.getid());
         req_a->alias = new uint8_t(alias);
+        req_a->prefetch = new uint8_t(1);
         // Log("== id == acquire %d\n", *req_a->source);
         pendingA.init(req_a, 1);
         Log("[%ld] [AcquirePerm] addr: %x alias: %d\n", *cycles, address, alias);

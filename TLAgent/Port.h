@@ -92,6 +92,7 @@ namespace tl_agent {
         Echo *echo;
         uint8_t *corrupt;
         uint8_t *alias;
+        uint8_t *prefetch;
     };
 
     class ChnB : public Decoupled {
