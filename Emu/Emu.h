@@ -30,7 +30,7 @@ private:
     GlobalBoard<paddr_t> *globalBoard;
     BaseAgent_t ** const agents = new BaseAgent_t*[NR_AGENTS];
     Fuzzer ** const fuzzers = new Fuzzer*[NR_AGENTS];
-    uint64_t seed = 0, wave_begin = 0, wave_end = 0;
+    uint64_t seed = 0, wave_begin = 0, wave_end = 0, clear_perf = 0;
     bool enable_wave = true;
     bool enable_trace = false;
     std::ifstream trace_file;

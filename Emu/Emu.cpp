@@ -13,6 +13,22 @@ bool dump_db = false;
 int trans_count = 0;
 double sc_time_stamp() { return 0; }
 
+static inline void print_help(const char *file) {
+    printf("Usage: %s [OPTION...]\n", file);
+    printf("Options:\n");
+    printf("  -s, --seed=NUM            use this seed\n");
+    printf("  -b, --wave-begin=CYCLE    dump wave from this cycle\n");
+    printf("  -e, --wave-end=CYCLE      stop dumping at this cycle\n");
+    printf("  -c, --cycles=NUM          execute at most NUM cycles\n");
+    printf("  -t, --trace=FILE          enable trace and set trace file\n");
+    printf("  -w, --warm-up=CYCLE       clear perf counters at this cycle\n");
+    printf("  -f, --wave-full           dump full waveform\n");
+    printf("  -v, --verbose             verbose, dump log\n");
+    printf("  -d, --dump-db             dump chiselDB\n");
+    printf("  -h, --help                print program help info\n");
+    printf("\n");
+}
+
 void Emu::parse_args(int argc, char **argv) {
     const struct option long_options[] = {
         { "seed",       1, NULL, 's' },
@@ -20,20 +36,23 @@ void Emu::parse_args(int argc, char **argv) {
         { "wave-end",   1, NULL, 'e' },
         { "cycles",     1, NULL, 'c' },
         { "trace",      1, NULL, 't' },
+        { "warm-up",    1, NULL, 'w' },
         { "wave-full",  0, NULL, 'f' },
         { "verbose",    0, NULL, 'v' },
         { "dump-db",    0, NULL, 'd' },
+        { "help",       0, NULL, 'h' },
         { 0,            0, NULL,  0  }
     };
     int o;
     int long_index = 0;
     while ( (o = getopt_long(argc, const_cast<char *const*>(argv),
-                             "-s:b:e:c:t:f:vd", long_options, &long_index)) != -1) {
+                             "-s:b:e:c:t:w:fvdh", long_options, &long_index)) != -1) {
         switch (o) {
             case 's': this->seed = atoll(optarg);       break;
             case 'b': this->wave_begin = atoll(optarg); break;
             case 'e': this->wave_end = atoll(optarg);   break;
             case 'c': this->exe_cycles = atoll(optarg); break;
+            case 'w': this->clear_perf = atoll(optarg); break;
             case 'f': this->wave_full = true;           break;
             case 'v': Verbose = true;                   break;
             case 'd':
@@ -45,10 +64,11 @@ void Emu::parse_args(int argc, char **argv) {
             case 't':
                 this->enable_trace = true;
                 this->trace_file = std::ifstream(optarg);
-                printf("Trace format: 'timestamp, which L1, channel, opcode, address, param'\n");
+                printf("Trace format: 'timestamp, which L1(0: I$; 1: D$), channel, opcode, address(base10), param'\n");
                 break;
             default:
-                tlc_assert(false, "Unknown args!");
+                print_help(argv[0]);
+                exit(0);
         }
     }
     if (this->wave_begin >= this->wave_end) {
@@ -258,7 +278,13 @@ void Emu::execute(uint64_t nr_cycle) {
           this->tfp->dump((vluint64_t)Cycles*2);
         }
 #endif
+        if (Cycles == clear_perf) {
+            dut_ptr->clean = 1;
+        } else {
+            dut_ptr->clean = 0;
+        }
     }
+    dut_ptr->timer = Cycles;
     dut_ptr->dump = 1;
     this->neg_edge();
     this->pos_edge();
