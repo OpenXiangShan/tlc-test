@@ -159,16 +159,16 @@ Emu::~Emu() {
     }
 }
 
+extern Emu *globalEmuPtr;
 void abortHandler(int signal) {
     printf("Cycles: %ld\33[0m\n", Cycles);
+    printf("Abort\n");
     fflush(stdout);
     fflush(stderr);
-#ifdef ENABLE_CHISEL_DB
-    if(dump_db){
-        time_t now = time(NULL);
-        save_db(logdb_filename(now));
+    if (globalEmuPtr) {
+        globalEmuPtr->~Emu();
     }
-#endif
+    std::exit(signal);
 }
 
 void Emu::execute(uint64_t nr_cycle) {
