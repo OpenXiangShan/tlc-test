@@ -146,7 +146,7 @@ namespace tl_agent {
                 switch (exact_privilege) {
                     case TIP:    req_c->param = new uint8_t(TtoN); break;
                     case BRANCH: req_c->param = new uint8_t(BtoN); break;
-                    default: tlc_assert(false, "Try to probe toB an invalid block!");
+                    default: tlc_assert(false, "Try to probe toN an invalid block!");
                 }
             }
             if (!globalBoard->haskey(*b->address)) {
