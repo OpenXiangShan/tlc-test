@@ -286,6 +286,7 @@ void Emu::execute(uint64_t nr_cycle) {
     }
     dut_ptr->timer = Cycles;
     dut_ptr->dump = 1;
+    dut_ptr->logEnable = 1;
     this->neg_edge();
     this->pos_edge();
 }
