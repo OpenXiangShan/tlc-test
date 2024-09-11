@@ -10,6 +10,6 @@ int main(int argc, char **argv) {
     emu.reset(10);
     emu.execute(emu.exe_cycles);
     std::cout << std::endl << "Finished" << std::endl;
-    std::cout << "Transcations: " << trans_count << std::endl;
+    std::cout << "Transactions: " << trans_count << std::endl;
     return 0;
 }
