@@ -1,4 +1,5 @@
-export CPHOME="/nfs/home/chenxi/CoupledL2"
+# export CPHOME="/nfs/home/chenxi/CoupledL2"
+export CPHOME=/nfs/home/chenxi/xs7/coupledL2
 
 C=0
 B=0
@@ -25,12 +26,14 @@ done
 
 if [ $C -eq 1 ]; then
     make -C $CPHOME test-top-xsconfig
+    python3 zero_ram.py -s $CPHOME
+
 fi
 if [ $B -eq 1 ]; then
     rm -rf build
     mkdir build
     cd build
-    cmake .. -DDUT_DIR=$CPHOME/build -DTHREAD=4 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Release -DNOCHECK=1
+    cmake .. -DDUT_DIR=$CPHOME/build -DTHREAD=8 -DTRACE=1 -DCHISELDB=1 -DCMAKE_BUILD_TYPE=Release -DNOCHECK=1
     cd ..
 fi
 if [ $M -eq 1 ]; then
