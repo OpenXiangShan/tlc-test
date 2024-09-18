@@ -41,7 +41,7 @@ enum {
     TIMEOUT_INTERVAL = 5000
 };
 
-typedef uint16_t paddr_t;
+typedef uint32_t paddr_t;
 
 #ifdef ENABLE_CHISEL_DB
 #define tlc_assert(cond, info) \
