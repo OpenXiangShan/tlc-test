@@ -1,0 +1,30 @@
+diff --git a/Emu/Emu.cpp b/Emu/Emu.cpp
+index c33182a..0ec9b4b 100644
+--- a/Emu/Emu.cpp
++++ b/Emu/Emu.cpp
+@@ -297,6 +297,7 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
+ }
+ 
+ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>* Emu::naive_gen_port2() {
++/*
+     auto port = new tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEATSIZE>();
+     port->a.ready = &(dut_ptr->master_port_1_0_a_ready);
+     port->a.valid = &(dut_ptr->master_port_1_0_a_valid);
+@@ -342,4 +343,5 @@ tl_agent::Port<tl_agent::ReqField, tl_agent::RespField, tl_agent::EchoField, BEA
+     port->e.valid = &(dut_ptr->master_port_1_0_e_valid);
+     port->e.sink = &(dut_ptr->master_port_1_0_e_bits_sink);
+     return port;
++*/
+ }
+diff --git a/Fuzzer/CFuzzer.cpp b/Fuzzer/CFuzzer.cpp
+index ddb0422..f2cd8d3 100644
+--- a/Fuzzer/CFuzzer.cpp
++++ b/Fuzzer/CFuzzer.cpp
+@@ -90,6 +90,6 @@ void CFuzzer::traceTest() {
+ }
+ 
+ void CFuzzer::tick() {
+-    this->randomTest(true);
++    this->randomTest(false);
+ //    this->caseTest();
+ }
